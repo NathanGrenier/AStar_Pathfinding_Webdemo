@@ -200,29 +200,13 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
     // );
   }, []); */
 
+  //let res: ReturnType<typeof aStar>;
+  const [res, setRes] = useState<ReturnType<typeof aStar>>();
   let timeout: number;
 
-  function runAStar(grid: Grid) {
-    const res = aStar(
-      grid /* , (currNode) => {
-      setRenderGrid(grid.clone());
-      let renderPlayback: number = 0.25; // Percentage of normal time
-      let delay: number = 1000 * renderPlayback; // Delay amount ;
-      //
-
-      const divNode = document.querySelector(
-        `.node[data-row='${currNode.row}'][data-col='${currNode.col}']`
-      ) as HTMLElement;
-
-      // @ts-ignore
-      divNode.node = currNode;
-
-      // visited node
-      // if () {
-      //   divNode.style.backgroundColor = "blue";
-      // }
-    } */
-    );
+  useEffect(() => {
+    if (!res) return;
+    console.log(res.timeTaken);
 
     const classesToRemove = ["path", "closed", "open"];
 
@@ -240,8 +224,7 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
     setTimeout(() => {
       if (res) {
         const { path, closedSet, openList } = res;
-
-        const delayTime = 75;
+        const delayTime = (75 * size) / 100;
 
         function closedSetAnimation(node: Node, i: number, animationScale: number) {
           const divNode = document.querySelector(
@@ -307,6 +290,10 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
         }, pathAnimationTimeout);
       }
     }, 10);
+  });
+
+  function runAStar(grid: Grid) {
+    setRes(aStar(grid));
   }
 
   // const dfs = useMemo(() => {
@@ -471,95 +458,58 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
           <div className="value right">{sliderMax}</div>
         </div>
       </label>
-      <div
-        ref={gridWrapperRef}
-        id="grid-wrapper"
-        onClick={(e) => {
-          if (e.target === e.currentTarget || e.shiftKey || e.ctrlKey) return;
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <div
+          ref={gridWrapperRef}
+          id="grid-wrapper"
+          onClick={(e) => {
+            if (e.target === e.currentTarget || e.shiftKey || e.ctrlKey) return;
 
-          const divNode = e.target as HTMLDivElement;
-          const { row, col } = divNode.dataset;
+            const divNode = e.target as HTMLDivElement;
+            const { row, col } = divNode.dataset;
 
-          grid.start = grid.nodes[Number(row)][Number(col)];
-          // setRenderGrid(grid.clone());
-          gridWrapperRef.current.querySelector(".start")?.classList.remove("start");
-          divNode.classList.add("start");
-          divNode.classList.remove("wall", "path", "end");
+            grid.start = grid.nodes[Number(row)][Number(col)];
+            // setRenderGrid(grid.clone());
+            gridWrapperRef.current.querySelector(".start")?.classList.remove("start");
+            divNode.classList.add("start");
+            divNode.classList.remove("wall", "path", "end");
 
-          runPathFinder(grid);
-        }}
-        onContextMenu={(e) => {
-          if (e.target === e.currentTarget || e.shiftKey || e.ctrlKey) return;
-          e.preventDefault();
+            runPathFinder(grid);
+          }}
+          onContextMenu={(e) => {
+            if (e.target === e.currentTarget || e.shiftKey || e.ctrlKey) return;
+            e.preventDefault();
 
-          const divNode = e.target as HTMLDivElement;
-          const { row, col } = divNode.dataset;
+            const divNode = e.target as HTMLDivElement;
+            const { row, col } = divNode.dataset;
 
-          grid.end = grid.nodes[Number(row)][Number(col)];
-          // setRenderGrid(grid.clone());
-          gridWrapperRef.current.querySelector(".end")?.classList.remove("end");
-          divNode.classList.add("end");
-          divNode.classList.remove("wall", "path", "start");
+            grid.end = grid.nodes[Number(row)][Number(col)];
+            // setRenderGrid(grid.clone());
+            gridWrapperRef.current.querySelector(".end")?.classList.remove("end");
+            divNode.classList.add("end");
+            divNode.classList.remove("wall", "path", "start");
 
-          runPathFinder(grid);
-        }}
-        onMouseDown={(e) => {
-          document.addEventListener("mouseup", mouseUpHandler, { once: true, capture: true });
-          gridWrapperRef.current.addEventListener("mousemove", mouseMoveHandler);
-        }}
-      >
-        {grid.nodes.map((nodeRows, i) => (
-          <div key={i} className="row">
-            {nodeRows.map((node, j) => (
-              <NodeDiv
-                key={j}
-                node={node}
-                // onMouseDown={
-                //   !selectedNodeRef.current && (node.start || node.end)
-                //     ? (e) => {
-                //         if (selectedNodeRef.current) return;
-                //         let currentTarget = e.currentTarget;
-                //         // setDragging(true);
-                //         selectedNodeRef.current = node;
-                //         const mouseMoveHandler = (e: MouseEvent) => {
-                //           if (!dragging && e.target instanceof HTMLDivElement) {
-                //             const { row, col } = e.target.dataset;
-                //             const newNode = grid.nodes[Number(row)][Number(col)];
-
-                //             if (newNode && !newNode.start && !newNode.end) {
-                //               const startOrEnd = node.start ? "start" : "end";
-                //               grid[startOrEnd] = newNode;
-                //               // setRenderGrid(grid.clone()); // TODO cloning may not be necessary
-                //               currentTarget.classList.remove(startOrEnd);
-                //               currentTarget = e.target;
-                //               e.target.classList.add(startOrEnd);
-                //             }
-                //           }
-                //         };
-                //         gridWrapperRef.current.addEventListener("mousemove", mouseMoveHandler);
-                //         const mouseUpHandler = () => {
-                //           gridWrapperRef.current.removeEventListener("mousemove", mouseMoveHandler);
-                //           // setDragging(false);
-                //           selectedNodeRef.current = null;
-                //         };
-                //         document.addEventListener("mouseup", mouseUpHandler, {
-                //           once: true,
-                //         });
-                //       }
-                //     : undefined
-                // }
-
-                // onDrag={
-                //   node.start || node.end
-                //     ? (e) => {
-                //         console.log(e);
-                //       }
-                //     : undefined
-                // }
-              />
-            ))}
+            runPathFinder(grid);
+          }}
+          onMouseDown={(e) => {
+            document.addEventListener("mouseup", mouseUpHandler, { once: true, capture: true });
+            gridWrapperRef.current.addEventListener("mousemove", mouseMoveHandler);
+          }}
+        >
+          {grid.nodes.map((nodeRows, i) => (
+            <div key={i} className="row">
+              {nodeRows.map((node, j) => (
+                <NodeDiv key={j} node={node} />
+              ))}
+            </div>
+          ))}
+        </div>
+        {res && (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div>Time Taken: {res.timeTaken.toFixed(2)} ms</div>
+            <div>Nodes Explored: {res.nodesExplored}</div>
           </div>
-        ))}
+        )}
       </div>
       <button
         type="button"
