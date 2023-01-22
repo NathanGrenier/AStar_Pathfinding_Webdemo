@@ -506,7 +506,7 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
           ))}
         </div>
         {res && (
-          <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", flexDirection: "column", margin: 10 }}>
             <div>Time Taken: {res.timeTaken.toFixed(2)} ms</div>
             <div>Nodes Explored: {res.nodesExplored}</div>
           </div>
