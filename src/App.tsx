@@ -433,32 +433,33 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
 
   return (
     <>
-      <label
-        style={{
-          textAlign: "center",
-        }}
-      >
-        Maze Size
-        <div
+      <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+        <label
           style={{
-            display: "flex",
+            textAlign: "center",
           }}
         >
-          <div className="value left">{sliderMin}</div>
-          <input
-            id="size_slider"
-            type="range"
-            min={sliderMin}
-            max={sliderMax}
-            defaultValue={size}
-            onChange={(e) => {
-              setSize(Number(e.currentTarget.value));
+          Maze Size
+          <div
+            style={{
+              display: "flex",
             }}
-          ></input>
-          <div className="value right">{sliderMax}</div>
-        </div>
-      </label>
-      <div style={{ display: "flex", alignItems: "center" }}>
+          >
+            <div className="value left">{sliderMin}</div>
+            <input
+              id="size_slider"
+              type="range"
+              min={sliderMin}
+              max={sliderMax}
+              defaultValue={size}
+              onChange={(e) => {
+                setSize(Number(e.currentTarget.value));
+              }}
+            ></input>
+            <div className="value right">{sliderMax}</div>
+          </div>
+        </label>
+
         <div
           ref={gridWrapperRef}
           id="grid-wrapper"
