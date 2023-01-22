@@ -1,0 +1,70 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  --node-size: 20px;
+}
+
+html,
+body {
+  margin: 0;
+  overflow: hidden;
+  color-scheme: dark;
+}
+
+#grid-wrapper {
+  max-width: calc(10px * 10);
+  display: flex;
+  min-width: 100%;
+  min-height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  flex-wrap: wrap;
+
+  margin-top: 5em;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  min-width: 100vw;
+  height: var(--node-size);
+}
+
+.node {
+  min-width: var(--node-size);
+  min-height: var(--node-size);
+  width: var(--node-size);
+  height: var(--node-size);
+  background-color: white;
+  overflow: hidden;
+  line-height: 0;
+  margin: 0;
+  padding: 0;
+  outline: 1px solid black;
+}
+
+.node:hover {
+  scale: 1.05;
+  transition: scale 0.1s ease;
+}
+
+.node.wall {
+  background-color: rgb(52, 52, 52);
+}
+
+.node.start {
+  background-color: green;
+}
+
+.node.path {
+  background-color: purple;
+}
+
+.node.end {
+  background-color: red;
+}
