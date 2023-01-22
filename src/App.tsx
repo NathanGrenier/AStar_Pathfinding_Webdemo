@@ -93,7 +93,7 @@ function App() {
   return (
     <>
       <RenderGrid type={"aStar"} />
-      <RenderGrid type={"DFS"} />
+      {/* <RenderGrid type={"DFS"} /> */}
     </>
   );
 }
@@ -103,8 +103,10 @@ function resizeForMaze(size: number) {
 }
 
 function RenderGrid({ type }: { type: typeof algos[number] }) {
-  const size = 10;
+  const [size, setSize] = useState(10);
+
   const resized = resizeForMaze(size);
+
   const grid = useMemo(() => {
     const grid = new Grid(
       Array(resized)
@@ -123,14 +125,14 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
     // grid.end = grid.nodes[0][grid.nodes[0].length - 1];
 
     // generate maze
-    /* const maze = generateMaze(size, size, undefined, Math.trunc(Math.random() * 10000));
+    const maze = generateMaze(size, size, undefined, Math.trunc(Math.random() * 1000));
 
-    console.log(maze);
+    // console.log(maze);
 
     for (let i = 1; i < grid.nodes.length; i += 2) {
-      for (let j = 1; j < grid.nodes[0].length; j += 2) {
-        const mazeRow = Math.trunc(i / 2 - 1);
-        const mazeCol = Math.trunc(j / 2 - 1);
+      for (let j = 1; j < grid.nodes.length; j += 2) {
+        let mazeRow = Math.trunc((i - 1) / 2);
+        let mazeCol = Math.trunc((j - 1) / 2);
         if (maze[mazeRow][mazeCol].top) {
           for (let k = -1; k < 2; k++) {
             grid.nodes[i - 1][j + k].walkable = false;
@@ -143,7 +145,7 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
           }
         }
 
-        if (maze[mazeRow][mazeCol].left) {
+        if (maze[mazeRow][mazeCol].right) {
           for (let k = -1; k < 2; k++) {
             grid.nodes[i + k][j + 1].walkable = false;
           }
@@ -155,10 +157,9 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
           }
         }
       }
-    } */
-
+    }
     return grid;
-  }, []);
+  }, [size]);
 
   // const [height, setHeight] = useState(size);
   // const [width, setWidth] = useState(size);
@@ -199,7 +200,7 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
     // );
   }, []); */
 
-  const [renderGrid, setRenderGrid] = useState<Grid>(grid);
+  let timeout: number;
 
   function runAStar(grid: Grid) {
     const res = aStar(
@@ -223,26 +224,89 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
     } */
     );
 
-    const pathClassesToRemove = gridWrapperRef.current.querySelectorAll(".path");
+    const classesToRemove = ["path", "closed", "open"];
+
+    const pathClassesToRemove = gridWrapperRef.current.querySelectorAll(
+      classesToRemove.map((s) => "." + s).join(", ")
+    );
 
     for (const pathClass of pathClassesToRemove) {
-      pathClass.classList.remove("path");
+      pathClass.classList.remove(...classesToRemove);
+      classesToRemove.forEach((className) =>
+        (pathClass as HTMLElement).style.removeProperty(`--${className}-delay`)
+      );
     }
 
-    if (res) {
-      const { path } = res;
+    setTimeout(() => {
+      if (res) {
+        const { path, closedSet, openList } = res;
 
-      for (const node of path) {
-        // // todo move this
-        // node.visited = true;
+        const delayTime = 75;
 
-        const divNode = document.querySelector(
-          `.node[data-row='${node.row}'][data-col='${node.col}']`
-        ) as HTMLElement;
+        function closedSetAnimation(node: Node, i: number, animationScale: number) {
+          const divNode = document.querySelector(
+            `.node[data-row='${node.row}'][data-col='${node.col}']`
+          ) as HTMLElement;
 
-        divNode.classList.add("path");
+          const animationTime = i * delayTime * animationScale;
+          divNode.style.setProperty("--closed-delay", `${animationTime}ms`);
+          divNode.classList.add("closed");
+          return animationTime;
+        }
+
+        function pathAnimation(node: Node, i: number) {
+          const divNode = document.querySelector(
+            `.node[data-row='${node.row}'][data-col='${node.col}']`
+          ) as HTMLElement;
+
+          const animationTime = i * delayTime;
+          divNode.style.setProperty("--path-delay", `${animationTime}ms`);
+          divNode.classList.add("path");
+          return animationTime;
+        }
+
+        function openListAnimation(node: Node, i: number) {
+          const divNode = document.querySelector(
+            `.node[data-row='${node.row}'][data-col='${node.col}']`
+          ) as HTMLElement;
+
+          const animationTime = i * delayTime;
+          divNode.style.setProperty("--open-delay", `${animationTime}ms`);
+          divNode.classList.add("open");
+          return animationTime;
+        }
+
+        let animationScale = 1;
+        if (closedSet.size > openList.length) {
+          // scale the closed set animation time
+          animationScale = openList.length / closedSet.size;
+        }
+
+        let pathAnimationTimeout = 0;
+        for (let i = 0; i < openList.length; i++) {
+          const node = openList[i];
+          pathAnimationTimeout = Math.max(pathAnimationTimeout, openListAnimation(node, i));
+        }
+
+        let i = 0;
+        for (const node of closedSet) {
+          pathAnimationTimeout = Math.max(
+            pathAnimationTimeout,
+            closedSetAnimation(node, i, animationScale)
+          );
+          i++;
+        }
+
+        // animate after the other animations are done
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          for (let i = 0; i < path.length; i++) {
+            const node = path[i];
+            pathAnimation(node, i);
+          }
+        }, pathAnimationTimeout);
       }
-    }
+    }, 10);
   }
 
   // const dfs = useMemo(() => {
@@ -377,8 +441,36 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
     gridWrapperRef.current.removeEventListener("mousemove", mouseMoveHandler);
   };
 
+  const sliderMin = 3;
+  const sliderMax = 30;
+
   return (
     <>
+      <label
+        style={{
+          textAlign: "center",
+        }}
+      >
+        Maze Size
+        <div
+          style={{
+            display: "flex",
+          }}
+        >
+          <div className="value left">{sliderMin}</div>
+          <input
+            id="size_slider"
+            type="range"
+            min={sliderMin}
+            max={sliderMax}
+            defaultValue={size}
+            onChange={(e) => {
+              setSize(Number(e.currentTarget.value));
+            }}
+          ></input>
+          <div className="value right">{sliderMax}</div>
+        </div>
+      </label>
       <div
         ref={gridWrapperRef}
         id="grid-wrapper"
@@ -416,7 +508,7 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
           gridWrapperRef.current.addEventListener("mousemove", mouseMoveHandler);
         }}
       >
-        {renderGrid?.nodes.map((nodeRows, i) => (
+        {grid.nodes.map((nodeRows, i) => (
           <div key={i} className="row">
             {nodeRows.map((node, j) => (
               <NodeDiv
