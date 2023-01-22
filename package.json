@@ -1,11 +1,14 @@
 {
+  "homepage": "https://nathangrenier.github.io/AStar_Pathfinding_Webdemo",
   "name": "temp",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc && vite build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
