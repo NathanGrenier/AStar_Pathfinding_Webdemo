@@ -3,7 +3,6 @@
   "name": "temp",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite --host",
     "predeploy": "npm run build",

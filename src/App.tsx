@@ -3,8 +3,11 @@ import generateMaze from "generate-maze";
 
 import NodeDiv from "./components/NodeDiv";
 import { aStar } from "./lib/aStar";
+import init, { a_star_wasm } from "./rust/pkg";
 // import DFSPathfinder from "./lib/DFS";
 import Node from "./lib/Node";
+
+init();
 
 export class Grid {
   public length = 0;
@@ -293,7 +296,15 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
   });
 
   function runAStar(grid: Grid) {
-    setRes(aStar(grid));
+    console.time("aStar");
+    const res = a_star_wasm(grid);
+    const res2 = aStar(grid);
+    console.timeEnd("aStar");
+
+    console.log(res);
+    console.log(res2);
+    // setRes(aStar(grid));
+    setRes(res);
   }
 
   // const dfs = useMemo(() => {

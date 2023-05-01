@@ -11,8 +11,8 @@ export default class Node {
   // coords
   row: number;
   col: number;
-  right: null;
-  left: null;
+  right!: null;
+  left!: null;
 
   visited = false; // part of the final path
 
