@@ -109,13 +109,8 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
 
   const grid = useMemo(() => {
     const grid = new Grid(
-      Array(resized)
-        .fill([])
-        .map((_, i) =>
-          Array(resized)
-            .fill(0)
-            .map((_, j) => new Node(i, j))
-        )
+      Array(resized).fill([]).map((_, i) => Array(resized).fill(0).map((_, j) => new Node(i, j))
+      )
     );
     // Set the bottom left and top right nodes to start and end respectfully
     // grid.nodes[grid.nodes.length - 1][0].start = true;
@@ -126,8 +121,6 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
 
     // generate maze
     const maze = generateMaze(size, size, undefined, Math.trunc(Math.random() * 1000));
-
-    // console.log(maze);
 
     for (let i = 1; i < grid.nodes.length; i += 2) {
       for (let j = 1; j < grid.nodes.length; j += 2) {
@@ -475,7 +468,17 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
             divNode.classList.add("start");
             divNode.classList.remove("wall", "path", "end");
 
-            runPathFinder(grid);
+            // Clears all the nodes of the grid of their colors (path, open, closed)
+            for (let i = 0; i < grid.nodes.length; i++) {
+              for (let j = 0; j < grid.nodes[i].length; j++) {
+                const currentNode = document.querySelector(
+                  `.node[data-row='${grid.nodes[i][j].row}'][data-col='${grid.nodes[i][j].col}']`
+                ) as HTMLElement;
+                currentNode.classList.remove("open", "path", "closed");
+              }
+            }
+
+            //runPathFinder(grid);
           }}
           onContextMenu={(e) => {
             if (e.target === e.currentTarget || e.shiftKey || e.ctrlKey) return;
@@ -489,8 +492,17 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
             gridWrapperRef.current.querySelector(".end")?.classList.remove("end");
             divNode.classList.add("end");
             divNode.classList.remove("wall", "path", "start");
-
-            runPathFinder(grid);
+            
+            // Clears all the nodes of the grid of their colors (path, open, closed)
+            for (let i = 0; i < grid.nodes.length; i++) {
+              for (let j = 0; j < grid.nodes[i].length; j++) {
+                const currentNode = document.querySelector(
+                  `.node[data-row='${grid.nodes[i][j].row}'][data-col='${grid.nodes[i][j].col}']`
+                ) as HTMLElement;
+                currentNode.classList.remove("open", "path", "closed");
+              }
+            }
+            //runPathFinder(grid);
           }}
           onMouseDown={(e) => {
             document.addEventListener("mouseup", mouseUpHandler, { once: true, capture: true });
@@ -507,7 +519,7 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
         </div>
         {res && (
           <div style={{ display: "flex", flexDirection: "column", margin: 10 }}>
-            <div>Time Taken: {res.timeTaken.toFixed(2)} ms</div>
+            <div>Time Taken: {res.timeTaken} ms</div>
             <div>Nodes Explored: {res.nodesExplored}</div>
           </div>
         )}

@@ -72,7 +72,7 @@ body {
 .node.closed {
   transition: background-color 0.5s ease;
   transition-delay: var(--closed-delay, 0s);
-  background-color: rgb(175, 238, 238);
+  background-color: rgb(175, 213, 238);
 }
 
 .node.path {
