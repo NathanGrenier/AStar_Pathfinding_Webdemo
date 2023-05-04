@@ -1,0 +1,137 @@
+body.active-modal {
+    overflow-y: hidden;
+}
+
+.btn-modal {
+    padding: 5px 10px;
+    display: block;
+    margin: 5px;
+    font-size: 18px;
+}
+
+.modal, .overlay {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+}
+
+.overlay {
+    background: rgba(49,49,49,0.8);
+}
+
+.modal-content {
+    position: absolute;
+    color: black;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1.4;
+    background: #f1f1f1;
+    border-radius: 12px;
+    max-width: 800px;
+    min-width: 450px;
+    padding: 10px;
+}
+
+.modal-content div.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Roboto","Arial",sans-serif;
+    font-size: 1.2rem;
+    line-height: 2rem;
+    font-weight: 400;
+}
+
+.header {
+    padding: 20px;
+    padding-bottom: 0px;
+    font-family: "Roboto","Arial",sans-serif;
+    font-size: 1.2rem;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.modal-content div.node {
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.close-modal {
+    position: absolute;
+    right: 32px;
+    top: 32px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.3;
+}
+.close-modal:hover {
+    opacity: 1;
+}
+.close-modal:before, .close-modal:after {
+    position: absolute;
+    left: 15px;
+    content: ' ';
+    height: 33px;
+    width: 2px;
+    background-color: #333;
+}
+.close-modal:before {
+    transform: rotate(45deg);
+}
+.close-modal:after {
+    transform: rotate(-45deg);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+}
+  
+.item {
+    height: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    color: black;
+    font-size: 24px;
+}
+  
+.item:nth-child(even) {
+    background-color: #f1f1f1;
+}
+
+.item:nth-child(odd) {
+    background-color: rgb(219, 215, 215);
+}
+
+
+@font-face {
+    font-family: 'Material Symbols Outlined';
+    font-style: normal;
+    font-weight: 100 700;
+    src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v108/kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsI.woff2) format('woff2');
+  }
+  
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+  }
