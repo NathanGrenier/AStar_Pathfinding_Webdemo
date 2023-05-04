@@ -4,7 +4,7 @@ export default function NodeDiv({
   node,
   ...props
 }: { node: Node } & React.HTMLAttributes<HTMLDivElement>) {
-  const type = node.start
+  let type = node.start
     ? " start"
     : node.end
     ? " end"
@@ -12,6 +12,10 @@ export default function NodeDiv({
     ? " path"
     : !node.walkable
     ? " wall"
+    : node.open
+    ? " open"
+    : node.closed
+    ? " closed"
     : "";
   return (
     <div

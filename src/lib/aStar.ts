@@ -38,6 +38,7 @@ export function aStar(grid: Grid): aStarReturn | undefined {
     if (currentNode === grid.end) {
       let endTime = performance.now();
       let timeTaken = endTime - startTime; // In milliseconds
+      console.log(timeTaken);
       nodesExplored = openList.length + closedSet.size;
       return {
         path: retracePath(grid.start, grid.end),

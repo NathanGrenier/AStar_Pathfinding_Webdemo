@@ -11,10 +11,10 @@ export default class Node {
   // coords
   row: number;
   col: number;
-  right: null;
-  left: null;
 
   visited = false; // part of the final path
+  open : boolean
+  closed : boolean
 
   constructor(row: number, col: number) {
     this.walkable = true;
@@ -28,6 +28,10 @@ export default class Node {
     // coords
     this.row = row;
     this.col = col;
+
+    // Really bad. But I have to
+    this.open = false;
+    this.closed = false;
   }
 
   get fCost() {

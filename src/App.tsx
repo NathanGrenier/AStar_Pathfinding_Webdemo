@@ -2,9 +2,12 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import generateMaze from "generate-maze";
 
 import NodeDiv from "./components/NodeDiv";
+import Modal from "./components/Modal/Modal";
 import { aStar } from "./lib/aStar";
 // import DFSPathfinder from "./lib/DFS";
 import Node from "./lib/Node";
+
+import "./node.css";
 
 export class Grid {
   public length = 0;
@@ -43,50 +46,6 @@ export class Grid {
   }
 }
 
-function getNodeSize() {
-  // const rowNum = 10;
-  // const colNum = 10;
-  // const rowLegnth = wrapper.width;
-  // const rowHeight = wrapper.height / rowNum;
-  // const colLegnth = wrapper.width / colNum;
-  // const colHeight = wrapper.height;
-  // const area = rowLength * colHeight;
-  // const nodeSideLength = Math.sqrt(area / 100);
-}
-
-/* function Controls() {
-  return (
-    <>
-      <label>
-        Columns
-        <input
-          type="range"
-          defaultValue={width}
-          onChange={(e) => {
-            setWidth(Number(e.target.value));
-          }}
-          step="2"
-          min="2"
-          max={size}
-        />
-      </label>
-      <label>
-        Rows
-        <input
-          type="range"
-          defaultValue={height}
-          onChange={(e) => {
-            setHeight(Number(e.target.value));
-          }}
-          step="2"
-          min="2"
-          max={size}
-        />
-      </label>
-    </>
-  );
-} */
-
 const algos = ["aStar", "DFS"] as const;
 
 function App() {
@@ -112,12 +71,6 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
       Array(resized).fill([]).map((_, i) => Array(resized).fill(0).map((_, j) => new Node(i, j))
       )
     );
-    // Set the bottom left and top right nodes to start and end respectfully
-    // grid.nodes[grid.nodes.length - 1][0].start = true;
-    // grid.nodes[0][grid.nodes[0].length - 1].end = true;
-
-    // grid.start = grid.nodes[grid.nodes.length - 1][0];
-    // grid.end = grid.nodes[0][grid.nodes[0].length - 1];
 
     // generate maze
     const maze = generateMaze(size, size, undefined, Math.trunc(Math.random() * 1000));
@@ -154,52 +107,13 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
     return grid;
   }, [size]);
 
-  // const [height, setHeight] = useState(size);
-  // const [width, setWidth] = useState(size);
-
-  // const [start, setStart] = useState<Node>(grid.start);
-
   const gridWrapperRef = useRef<HTMLDivElement>(null!);
 
-  // useLayoutEffect(() => {
-  //   const wrapper = gridWrapperRef.current;
-
-  //   const area = wrapper.clientWidth * wrapper.clientHeight;
-  //   const nodeSideLength = Math.sqrt(area / (height * width));
-
-  //   // const nodeHeight = window.innerHeight / height;
-  //   // const nodeWidth = window.innerWidth / width;
-
-  //   document.documentElement.style.setProperty(
-  //     "--node-size",
-  //     `${nodeSideLength}px`
-  //   );
-  // }, [height, width]);
-
-  /* useLayoutEffect(() => {
-    const wrapper = gridWrapperRef.current;
-    const nodeWidth = wrapper.clientWidth / width;
-    document.documentElement.style.setProperty("--node-size", `${nodeWidth}px`);
-
-    const widthToAdd = (wrapper.clientWidth % width) / width;
-
-    // const currentNodeSize = parseFloat(
-    //   getComputedStyle(document.documentElement).getPropertyValue("--node-size")
-    // );
-
-    // document.documentElement.style.setProperty(
-    //   "--node-size",
-    //   `${currentNodeSize + widthToAdd}px`
-    // );
-  }, []); */
-
-  //let res: ReturnType<typeof aStar>;
   const [res, setRes] = useState<ReturnType<typeof aStar>>();
   let timeout: number;
 
   useEffect(() => {
     if (!res) return;
-    console.log(res.timeTaken);
 
     const classesToRemove = ["path", "closed", "open"];
 
@@ -307,95 +221,6 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
     funcs[type](grid);
   };
 
-  // useEffect(() => {
-  //   runAStar(grid);
-  // });
-
-  // const [dragging, setDragging] = useState(false);
-
-  // const selectedNodeRef = useRef<Node | null>(null);
-
-  /* useEffect(() => {
-    let start = gridWrapperRef.current.querySelector(".start") as HTMLDivElement;
-    let end = gridWrapperRef.current.querySelector(".end") as HTMLDivElement;
-
-    const mousedownHandler = (e: MouseEvent) => {
-      // if (selectedNodeRef.current) return;
-      let currentTarget = e.currentTarget as HTMLDivElement;
-      // setDragging(true);
-      // selectedNodeRef.current = node;
-      const mouseMoveHandler = (e: MouseEvent) => {
-        if (e.target instanceof HTMLDivElement) {
-          // @ts-ignore
-          const node = start.node as Node;
-          const { row, col } = e.target.dataset;
-          const newNode = grid.nodes[Number(row)][Number(col)];
-
-          if (newNode && !newNode.start && !newNode.end) {
-            const startOrEnd = node.start ? "start" : "end";
-            grid[startOrEnd] = newNode;
-            // setRenderGrid(grid.clone()); // TODO cloning may not be necessary
-            currentTarget.classList.remove(startOrEnd);
-            // @ts-ignore
-            e.target.node = newNode;
-            currentTarget = e.target;
-            start = e.target;
-            e.target.classList.add(startOrEnd);
-          }
-        }
-      };
-      gridWrapperRef.current.addEventListener("mousemove", mouseMoveHandler);
-      const mouseUpHandler = () => {
-        gridWrapperRef.current.removeEventListener("mousemove", mouseMoveHandler);
-        // setDragging(false);
-        // selectedNodeRef.current = null;
-      };
-      document.addEventListener("mouseup", mouseUpHandler, {
-        once: true,
-      });
-    };
-
-    start.addEventListener("mousedown", mousedownHandler);
-  }, []); */
-
-  /* useEffect(() => {
-    // click to set start node
-    const clickHandler = (e: MouseEvent) => {
-      const divNode = e.target as HTMLDivElement;
-      const { row, col } = divNode.dataset;
-
-      grid.start = grid.nodes[Number(row)][Number(col)];
-      // setRenderGrid(grid.clone());
-      gridWrapperRef.current.querySelector(".start")?.classList.remove("start");
-      gridWrapperRef.current
-        .querySelector(`.node[data-row='${row}'][data-col='${col}']`)
-        ?.classList.add("start");
-      runPathFinder(grid);
-    };
-    gridWrapperRef.current.addEventListener("click", clickHandler);
-
-    // click to set end node
-    const rightClickHandler = (e: MouseEvent) => {
-      e.preventDefault();
-      const divNode = e.target as HTMLDivElement;
-      const { row, col } = divNode.dataset;
-
-      grid.end = grid.nodes[Number(row)][Number(col)];
-      // setRenderGrid(grid.clone());
-      gridWrapperRef.current.querySelector(".end")?.classList.remove("end");
-      gridWrapperRef.current
-        .querySelector(`.node[data-row='${row}'][data-col='${col}']`)
-        ?.classList.add("end");
-      runPathFinder(grid);
-    };
-    gridWrapperRef.current.addEventListener("contextmenu", rightClickHandler);
-
-    return () => {
-      gridWrapperRef.current.removeEventListener("click", clickHandler);
-      gridWrapperRef.current.removeEventListener("contextmenu", rightClickHandler);
-    };
-  }, []); */
-
   // add walls
   const mouseMoveHandler = (e: MouseEvent) => {
     document.removeEventListener("mouseup", mouseUpHandler);
@@ -407,9 +232,11 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
       if (e.shiftKey) {
         if (e.buttons === 1) {
           node.walkable = false;
-          e.target.classList.add("wall");
           e.target.classList.remove("path");
-        } else if (e.buttons === 2) {
+          e.target.classList.remove("open");
+          e.target.classList.remove("closed");
+          e.target.classList.add("wall");
+        } else if (e.buttons === 2) {          
           node.walkable = true;
           e.target.classList.remove("wall");
         }
@@ -447,6 +274,14 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
               defaultValue={size}
               onChange={(e) => {
                 setSize(Number(e.currentTarget.value));
+                // Clear res so nothing from before renders
+                setRes({
+                  closedSet: new Set(),
+                  nodesExplored: 0,
+                  openList: [],
+                  path: [],
+                  timeTaken: 0,
+                });
               }}
             ></input>
             <div className="value right">{sliderMax}</div>
@@ -467,22 +302,16 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
             gridWrapperRef.current.querySelector(".start")?.classList.remove("start");
             divNode.classList.add("start");
             divNode.classList.remove("wall", "path", "end");
-
-            // Clears all the nodes of the grid of their colors (path, open, closed)
-            for (let i = 0; i < grid.nodes.length; i++) {
-              for (let j = 0; j < grid.nodes[i].length; j++) {
-                const currentNode = document.querySelector(
-                  `.node[data-row='${grid.nodes[i][j].row}'][data-col='${grid.nodes[i][j].col}']`
-                ) as HTMLElement;
-                currentNode.classList.remove("open", "path", "closed");
-              }
-            }
-
-            //runPathFinder(grid);
+            
+            runPathFinder(grid);
           }}
           onContextMenu={(e) => {
-            if (e.target === e.currentTarget || e.shiftKey || e.ctrlKey) return;
+            if (e.target === e.currentTarget || e.ctrlKey) return;
             e.preventDefault();
+            
+            if (e.shiftKey) {
+              return;
+            }
 
             const divNode = e.target as HTMLDivElement;
             const { row, col } = divNode.dataset;
@@ -493,22 +322,13 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
             divNode.classList.add("end");
             divNode.classList.remove("wall", "path", "start");
             
-            // Clears all the nodes of the grid of their colors (path, open, closed)
-            for (let i = 0; i < grid.nodes.length; i++) {
-              for (let j = 0; j < grid.nodes[i].length; j++) {
-                const currentNode = document.querySelector(
-                  `.node[data-row='${grid.nodes[i][j].row}'][data-col='${grid.nodes[i][j].col}']`
-                ) as HTMLElement;
-                currentNode.classList.remove("open", "path", "closed");
-              }
-            }
-            //runPathFinder(grid);
+            runPathFinder(grid);
           }}
           onMouseDown={(e) => {
             document.addEventListener("mouseup", mouseUpHandler, { once: true, capture: true });
             gridWrapperRef.current.addEventListener("mousemove", mouseMoveHandler);
           }}
-        >
+          >
           {grid.nodes.map((nodeRows, i) => (
             <div key={i} className="row">
               {nodeRows.map((node, j) => (
@@ -524,14 +344,18 @@ function RenderGrid({ type }: { type: typeof algos[number] }) {
           </div>
         )}
       </div>
-      <button
-        type="button"
-        onClick={() => {
-          runPathFinder(grid);
-        }}
-      >
-        Start A*
-      </button>
+      <div style={{ display: "flex", alignItems: "center", flexDirection: "row" }}>
+        <button
+          className="btn-modal"
+          type="button"
+          onClick={() => {
+            runPathFinder(grid);
+          }}
+        >
+          Start A*
+        </button>
+        <Modal></Modal>
+      </div>
     </>
   );
 }
