@@ -1,69 +1,45 @@
 import { Grid } from "../App";
 import Node from "./Node";
+import type { PathfindingResult } from "./types";
 
-type aStarReturn = {
-  path: Node[];
-  timeTaken: number;
-  nodesExplored: number;
-  openList: Node[];
-  closedSet: Set<Node>;
-};
-
-export function aStar(grid: Grid): aStarReturn | undefined {
+export function dijkstra(grid: Grid): PathfindingResult | undefined {
   const openList: Node[] = [grid.start];
   const closedSet: Set<Node> = new Set();
-  let nodesExplored: number = 0;
-
-  // Start timer
-  let startTime = performance.now();
+  // For Dijkstra, we initialize start with 0 cost.
+  grid.start.gCost = 0;
+  let nodesExplored = 0;
+  const startTime = performance.now();
 
   while (openList.length > 0) {
+    // Select the node with the lowest gCost.
     let currentNode = openList[0];
-
-    // TODO optimize
     for (let i = 1; i < openList.length; i++) {
-      if (
-        openList[i].fCost < currentNode.fCost ||
-        (openList[i].fCost === currentNode.fCost && openList[i].hCost < currentNode.hCost)
-      ) {
+      if (openList[i].gCost < currentNode.gCost) {
         currentNode = openList[i];
       }
     }
-
     openList.splice(openList.indexOf(currentNode), 1);
     closedSet.add(currentNode);
 
-    // TODO update the color of the new node in closedList
-
     if (currentNode === grid.end) {
-      let endTime = performance.now();
-      let timeTaken = endTime - startTime; // In milliseconds
-      console.log(timeTaken);
+      const endTime = performance.now();
       nodesExplored = openList.length + closedSet.size;
       return {
         path: retracePath(grid.start, grid.end),
-        timeTaken,
+        timeTaken: endTime - startTime,
         nodesExplored,
         openList,
         closedSet,
       };
     }
 
-    // TODO instead of callback, return the openList, closedList and path. These values will be used for the visualization (iterate through the arrays with a delay)
-    // cbCurrentNode(currentNode);
-
     const neighbors = getNeighbors(currentNode, grid);
-
     for (const neighbor of neighbors) {
-      // TODO update the colors of the nodes added to openedList
       if (closedSet.has(neighbor)) continue;
-
       const costToNeighbor = currentNode.gCost + getDistance(currentNode, neighbor);
       if (costToNeighbor < neighbor.gCost || !openList.includes(neighbor)) {
         neighbor.gCost = costToNeighbor;
-        neighbor.hCost = getDistance(neighbor, grid.end);
         neighbor.parent = currentNode;
-
         if (!openList.includes(neighbor)) {
           openList.push(neighbor);
         }
@@ -93,23 +69,20 @@ function getNeighbors(node: Node, grid: Grid): Node[] {
   return neighbors;
 }
 
-function getDistance(a: Node, b: Node) {
+function getDistance(a: Node, b: Node): number {
   const dy = Math.abs(a.row - b.row);
   const dx = Math.abs(a.col - b.col);
-
+  // This cost function supports diagonal movement.
   if (dx > dy) return a.diagonal * dy + a.length * (dx - dy);
-
   return a.diagonal * dx + a.length * (dy - dx);
 }
 
-function retracePath(startNode: Node, endNode: Node) {
+function retracePath(startNode: Node, endNode: Node): Node[] {
   const path: Node[] = [];
   let currentNode = endNode;
-
   while (currentNode !== startNode) {
     path.push(currentNode);
     currentNode = currentNode.parent!;
   }
-
   return path.reverse();
 }

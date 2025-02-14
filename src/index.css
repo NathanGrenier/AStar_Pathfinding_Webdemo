@@ -27,6 +27,8 @@ body {
   overflow: hidden;
   box-shadow: 0 0 12px 2px rgba(255, 78, 202, 0.637);
   margin: 1em;
+  width: fit-content;
+  justify-self: center;
 }
 
 .row {
