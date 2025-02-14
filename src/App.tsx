@@ -67,6 +67,7 @@ function RenderGrid() {
     worstTime: number;
     runs: number[];
   } | null>(null);
+  const [gridVersion, setGridVersion] = useState(0);
 
   const resized = resizeForMaze(size);
 
@@ -115,7 +116,19 @@ function RenderGrid() {
     }
 
     return grid;
-  }, [size, resized]);
+  }, [size, resized, gridVersion]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        runPathFinder(selectedAlgo);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedAlgo, grid]);
 
   const gridWrapperRef = useRef<HTMLDivElement>(null);
   const [res, setRes] = useState<ReturnType<typeof aStar>>();
@@ -285,6 +298,7 @@ function RenderGrid() {
               grid.nodes[0][j].walkable = false;
               grid.nodes[rows - 1][j].walkable = false;
             }
+            setGridVersion((prev) => prev + 1);
             // Reset results
             setRes(undefined);
             setBenchmarkResult(null);
